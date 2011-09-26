@@ -1,0 +1,5 @@
+name = CT Basic
+description = Enables a basic project node type for use with Case Tracker.
+core = 7.x
+package = "Case Tracker"
+dependencies[] = casetracker

@@ -1,0 +1,6 @@
+name = Case Tracker
+description = "Enables the handling of projects and their cases."
+core = 7.x
+package = "Case Tracker"
+dependencies[] = views
+

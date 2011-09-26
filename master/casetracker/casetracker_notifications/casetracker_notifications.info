@@ -1,0 +1,7 @@
+name = Case Tracker Notifications
+description = Notification integration for Casetracker
+core = 7.x
+package = "Case Tracker"
+dependencies[] = casetracker
+dependencies[] = notifications_content
+
