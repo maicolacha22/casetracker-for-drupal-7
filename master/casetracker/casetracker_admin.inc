@@ -46,7 +46,7 @@ function casetracker_settings() {
     );
   };
 
-  $node_types = node_type_get_types('names');
+  $node_types = node_type_get_names();
 
   $project_types = $node_types; unset($project_types['casetracker_basic_case']);
   $form['casetracker_general']['casetracker_project_node_types'] = array(
