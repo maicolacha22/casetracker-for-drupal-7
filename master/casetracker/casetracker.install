@@ -161,13 +161,8 @@ function casetracker_schema() {
  * Implementation of hook_install().
  */
 function casetracker_install() {
-  // Create tables.
-  drupal_install_schema('casetracker');
-
   // Create default case states.
-  db_insert('casetracker_case_states')
-    ->fields(array('case_state_name', 'case_state_realm', 'weight'))
-    ->values(array(
+  $values = array(
       array(
         'case_state_name'  => 'High',
         'case_state_realm' => 'priority',
@@ -223,8 +218,16 @@ function casetracker_install() {
         'case_state_realm' => 'type',
         'weight'           => 2,
       ),
-    ))
-    ->execute();
+    );
+
+  $query = db_insert('casetracker_case_states')
+    ->fields(array('case_state_name', 'case_state_realm', 'weight'));
+
+  foreach ($values as $record) {
+    $query->values($record);
+  }
+
+  $query->execute();
 }
 
 /**

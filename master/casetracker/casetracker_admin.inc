@@ -124,7 +124,7 @@ function casetracker_settings_submit($form, &$form_state) {
 /**
  * Displays a form for adding or editing a case state.
  */
-function casetracker_case_state_edit($form_state, $case_state = NULL) {
+function casetracker_case_state_edit($form, $form_state, $case_state = NULL) {
 
   $form = array();
   $form['case_state'] = array(
@@ -191,7 +191,7 @@ function casetracker_case_state_overview() {
     }
   }
 
-  return theme('table', $headers, $rows);
+  return theme('table', array('headers' => $headers, 'rows' => $rows));
 }
 
 /**
@@ -220,7 +220,7 @@ function casetracker_case_state_edit_submit($form, &$form_state) {
 /**
  * If the user has asked to delete a case state, we'll double-check.
  */
-function casetracker_case_state_confirm_delete(&$form_state, $case_state) {
+function casetracker_case_state_confirm_delete($form, &$form_state, $case_state) {
   if (!empty($case_state)) {
     $form = array(
       'csid' => array('#type' => 'value', '#value' => $case_state->csid),
