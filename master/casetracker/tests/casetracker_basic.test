@@ -10,7 +10,7 @@ class CasetrackerBasicTest extends DrupalWebTestCase {
       'name' => t('Project and case creation.'),
       'description' => t('Create project and cases using the casetracker_basic
                           content types'),
-      'group' => t('Case Tracker')
+      'group' => t('Case Tracker'),
     );
   }
 
@@ -28,7 +28,7 @@ class CasetrackerBasicTest extends DrupalWebTestCase {
     $auth_user = $this->drupalCreateUser(array(
       'access content',
       'create projects',
-      'create cases'
+      'create cases',
     ));
     $this->drupalLogin($auth_user);
 
@@ -49,7 +49,7 @@ class CasetrackerBasicTest extends DrupalWebTestCase {
       'casetracker[case_priority_id]' => 2,
       'casetracker[case_type_id]' => 11,
     );
-    $this->drupalPost(NULL, $edit ,t('Save'));
+    $this->drupalPost(NULL, $edit, t('Save'));
     $text = t('Case !name has been created.', array('!name' => $edit['title']));
     $this->assertText($text);
   }

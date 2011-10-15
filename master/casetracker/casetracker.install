@@ -163,62 +163,62 @@ function casetracker_schema() {
 function casetracker_install() {
   // Create default case states.
   $values = array(
-      array(
-        'case_state_name'  => 'High',
-        'case_state_realm' => 'priority',
-        'weight'           => -1,
-      ),
-      array(
-        'case_state_name'  => 'Normal',
-        'case_state_realm' => 'priority',
-        'weight'           => 0,
-      ),
-      array(
-        'case_state_name'  => 'Low',
-        'case_state_realm' => 'priority',
-        'weight'           => 1,
-      ),
-      array(
-        'case_state_name'  => 'Open',
-        'case_state_realm' => 'status',
-        'weight'           => 0,
-      ),
-      array(
-        'case_state_name'  => 'Resolved',
-        'case_state_realm' => 'status',
-        'weight'           => 1,
-      ),
-      array(
-        'case_state_name'  => 'Deferred',
-        'case_state_realm' => 'status',
-        'weight'           => 2,
-      ),
-      array(
-        'case_state_name'  => 'Duplicate',
-        'case_state_realm' => 'status',
-        'weight'           => 3,
-      ),
-      array(
-        'case_state_name'  => 'Closed',
-        'case_state_realm' => 'status',
-        'weight'           => 4,
-      ),
-      array(
-        'case_state_name'  => 'Bug',
-        'case_state_realm' => 'type',
-        'weight'           => 0,
-      ),
-      array(
-        'case_state_name'  => 'Feature Request',
-        'case_state_realm' => 'type',
-        'weight'           => 1,
-      ),
-      array(
-        'case_state_name'  => 'General Task',
-        'case_state_realm' => 'type',
-        'weight'           => 2,
-      ),
-    );
+    array(
+      'case_state_name' => 'High',
+      'case_state_realm' => 'priority',
+      'weight' => -1,
+    ),
+    array(
+      'case_state_name' => 'Normal',
+      'case_state_realm' => 'priority',
+      'weight' => 0,
+    ),
+    array(
+      'case_state_name' => 'Low',
+      'case_state_realm' => 'priority',
+      'weight' => 1,
+    ),
+    array(
+      'case_state_name' => 'Open',
+      'case_state_realm' => 'status',
+      'weight' => 0,
+    ),
+    array(
+      'case_state_name' => 'Resolved',
+      'case_state_realm' => 'status',
+      'weight' => 1,
+    ),
+    array(
+      'case_state_name' => 'Deferred',
+      'case_state_realm' => 'status',
+      'weight' => 2,
+    ),
+    array(
+      'case_state_name' => 'Duplicate',
+      'case_state_realm' => 'status',
+      'weight' => 3,
+    ),
+    array(
+      'case_state_name' => 'Closed',
+      'case_state_realm' => 'status',
+      'weight' => 4,
+    ),
+    array(
+      'case_state_name' => 'Bug',
+      'case_state_realm' => 'type',
+      'weight' => 0,
+    ),
+    array(
+      'case_state_name' => 'Feature Request',
+      'case_state_realm' => 'type',
+      'weight' => 1,
+    ),
+    array(
+      'case_state_name' => 'General Task',
+      'case_state_realm' => 'type',
+      'weight' => 2,
+    ),
+  );
 
   $query = db_insert('casetracker_case_states')
     ->fields(array('case_state_name', 'case_state_realm', 'weight'));

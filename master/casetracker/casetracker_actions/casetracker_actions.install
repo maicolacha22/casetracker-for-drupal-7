@@ -1,9 +1,9 @@
 <?php
 /**
-* casetracker_actions.install
-* 
-* Updates actions on installation/purges orphaned actions on disable.
-*/
+ * casetracker_actions.install
+ *
+ * Updates actions on installation/purges orphaned actions on disable.
+ */
 
 function casetracker_actions_install() {
   actions_synchronize(FALSE, TRUE);

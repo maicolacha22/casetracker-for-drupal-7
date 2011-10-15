@@ -11,7 +11,7 @@ function casetracker_views_default_views() {
   );
   $views = array();
   foreach ($list as $view_name) {
-    $view = call_user_func('_view_'. $view_name);
+    $view = call_user_func('_view_' . $view_name);
     $views[$view->name] = $view;
   }
   return $views;

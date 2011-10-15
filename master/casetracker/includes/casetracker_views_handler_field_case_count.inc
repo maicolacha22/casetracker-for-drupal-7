@@ -6,8 +6,7 @@
  */
 class casetracker_views_handler_field_case_count extends views_handler_field {
   // Empty query method -- we query in pre_render().
-  function query() {
-  }
+  function query() { }
 
   // Add options for case types.
   function option_definition() {

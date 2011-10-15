@@ -22,8 +22,8 @@ function casetracker_notifications_menu() {
  */
 function casetracker_notifications_permission() {
   return array(
-    'subscribe to cases'  => array(
-      'title' => t('Administer CaseTracker'), 
+    'subscribe to cases' => array(
+      'title' => t('Administer CaseTracker'),
       'description' => t('Perform administration tasks for CaseTracker.'),
     ),
   );
@@ -84,7 +84,7 @@ function casetracker_notifications_notifications_object_node($op, $node, $accoun
         // The assignee can be no user or anonymous so we just make sure we return an integer
         // @todo Other values may be possible, check with casetracker maintainers
         if (isset($node->casetracker->assign_to)) {
-          $conditions['casetracker_assign'] = (int)$node->casetracker->assign_to;
+          $conditions['casetracker_assign'] = (int) $node->casetracker->assign_to;
         }
         if (!empty($node->casetracker->pid)) {
           $conditions['casetracker_project'] = $node->casetracker->pid;

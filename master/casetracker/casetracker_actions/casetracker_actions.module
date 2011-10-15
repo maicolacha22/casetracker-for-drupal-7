@@ -7,16 +7,16 @@
 
 /**
  * Implementation of hook_action_info()
- * Used to define new actions: 
+ * Used to define new actions:
  *   set priority, set status, set type, set project, set assign-to, take case.
  */
 function casetracker_actions_action_info() {
   return array(
     'casetracker_actions_set_priority_action' => array(
       'description' => t('Set case priority'),
-      'type' => 'node',  
+      'type' => 'node',
       'configurable' => TRUE,
-      'hooks' => array('any' => TRUE),	// this is a sloppy cheat. 
+      'hooks' => array('any' => TRUE), // this is a sloppy cheat.
     ),
     'casetracker_actions_set_status_action' => array(
       'description' => t('Set case status'),
@@ -55,7 +55,7 @@ function casetracker_actions_action_info() {
  * Definitions of Action Behaviors
  */
 
-/** 
+/**
  * Set Priority action behavior.
  */
 function casetracker_actions_set_priority_action(&$object, $context = array()) {
@@ -63,7 +63,7 @@ function casetracker_actions_set_priority_action(&$object, $context = array()) {
   _casetracker_actions_act( $nid, 'case_priority_id', $context['priority']);
 }
 
-/** 
+/**
  * Set Status action behavior.
  */
 function casetracker_actions_set_status_action(&$object, $context = array()) {
@@ -71,7 +71,7 @@ function casetracker_actions_set_status_action(&$object, $context = array()) {
   _casetracker_actions_act($nid, 'case_status_id', $context['status']);
 }
 
-/** 
+/**
  * Set Type action behavior.
  */
 function casetracker_actions_set_type_action(&$object, $context = array()) {
@@ -79,7 +79,7 @@ function casetracker_actions_set_type_action(&$object, $context = array()) {
   _casetracker_actions_act($nid, 'case_type_id', $context['type']);
 }
 
-/** 
+/**
  * Set Assign to action behavior.
  */
 function casetracker_actions_set_assign_to_action(&$object, $context = array()) {
@@ -87,7 +87,7 @@ function casetracker_actions_set_assign_to_action(&$object, $context = array()) 
   _casetracker_actions_act($nid, 'assign_to', $context['assign_to']);
 }
 
-/** 
+/**
  * Set Project action behavior.
  */
 function casetracker_actions_set_project_action(&$object, $context = array()) {
@@ -95,12 +95,12 @@ function casetracker_actions_set_project_action(&$object, $context = array()) {
   _casetracker_actions_act($nid, 'pid', $context['project']);
 }
 
-/** 
+/**
  * Take Case action behavior.
  */
 function casetracker_actions_take_case_action(&$object, $context = array()) {
   global $user;
-  $nid = _casetracker_actions_get_nid( $object->nid, $context['nid'] );  
+  $nid = _casetracker_actions_get_nid( $object->nid, $context['nid'] );
   _casetracker_actions_act($nid, 'assign_to', $user->name);
 }
 
@@ -113,8 +113,8 @@ function casetracker_actions_take_case_action(&$object, $context = array()) {
  */
 function casetracker_actions_set_priority_action_form($context) {
   $case_priority_options = casetracker_realm_load('priority');
-  $default_priority = variable_get('casetracker_default_case_priority', 
-    key($case_priority_options));	
+  $default_priority = variable_get('casetracker_default_case_priority',
+    key($case_priority_options));
 
   $form['casetracker_actions_priority'] = array(
     '#title' => t('Priority'),
@@ -135,8 +135,8 @@ function casetracker_actions_set_priority_action_submit($form, $form_state) {
  */
 function casetracker_actions_set_status_action_form($context) {
   $case_status_options = casetracker_realm_load('status');
-  $default_status = variable_get('casetracker_default_case_status', 
-    key($case_status_options));	
+  $default_status = variable_get('casetracker_default_case_status',
+    key($case_status_options));
 
   $form['casetracker_actions_status'] = array(
     '#title' => t('Status'),
@@ -187,14 +187,14 @@ function casetracker_actions_set_assign_to_action_form($context) {
   );
   if (count($options) < 20) {
     $normalized = array();
-    foreach ($options as $uid=>$name) {
+    foreach ($options as $uid => $name) {
       $normalized[$uid] = $name;
     }
     $form['casetracker_actions_assign_to'] = array(
-    '#type' => 'radios',
-    '#title' => t('Assign to'),
-    '#required' => TRUE,
-    '#options' => $normalized,
+      '#type' => 'radios',
+      '#title' => t('Assign to'),
+      '#required' => TRUE,
+      '#options' => $normalized,
     );
   }
 
@@ -225,7 +225,7 @@ function casetracker_actions_set_project_action_form($context) {
   }
   else {
     $form['casetracker']['pid'] = array(
-      '#type' => 'value', 
+      '#type' => 'value',
       '#value' => !empty($default_project) ? $default_project : key($project_options),
     );
   }
@@ -245,14 +245,16 @@ function casetracker_actions_set_project_action_submit($form, $form_state) {
  * All casetracker actions have the same fundamental behavior.
  */
 function _casetracker_actions_act($nid, $field, $value) {
-  if(!$nid) return;
+  if (!$nid) {
+    return;
+  }
   // make sure we have a valid case node
   $node = node_load(array('nid' => $nid, 'type' => 'casetracker_basic_case'));
- 
+
   $success = _casetracker_actions_update_by_comment(
     $field, $value, $node);
-  
-  if($success) {
+
+  if ($success) {
     _casetracker_actions_log($field, $value, $nid);
   }
 }
@@ -281,27 +283,27 @@ function _casetracker_actions_get_nid($object_nid, $context_nid) {
  */
 function _casetracker_actions_update_by_comment($field, $value, $node) {
   global $user;
-  if (user_access('post comments') 
-    && (user_access('administer comments') || node_comment_mode($nid) 
+  if (user_access('post comments')
+     && (user_access('administer comments') || node_comment_mode($nid)
     == COMMENT_NODE_READ_WRITE)) {
 
-      $case_info = get_object_vars($node->casetracker);
-      $case_info[$field] = ($field == 'assign_to') ? casetracker_get_name($value) : $value;
-      if ($field != 'assign_to') {
-        $case_info['assign_to'] = casetracker_get_name($case_info['assign_to']);
-      }
+    $case_info = get_object_vars($node->casetracker);
+    $case_info[$field] = ($field == 'assign_to') ? casetracker_get_name($value) : $value;
+    if ($field != 'assign_to') {
+      $case_info['assign_to'] = casetracker_get_name($case_info['assign_to']);
+    }
 
-      // casetracker uses revision_id as a primary key for casetracker_case table.
-      $edit = array(
-        'nid' => $node->nid,
-        'pid' => 0, // comment parent id
-        'comment' => t('Case changed in bulk update.'), // comment body
-        'subject' => t('Update'),
-        'uid' => $user->uid,
-        'revision_id' => $node->vid,
-        'casetracker' => $case_info,
-      );
-      return comment_save($edit);
+    // casetracker uses revision_id as a primary key for casetracker_case table.
+    $edit = array(
+      'nid' => $node->nid,
+      'pid' => 0, // comment parent id
+      'comment' => t('Case changed in bulk update.'), // comment body
+      'subject' => t('Update'),
+      'uid' => $user->uid,
+      'revision_id' => $node->vid,
+      'casetracker' => $case_info,
+    );
+    return comment_save($edit);
   }
   drupal_set_message(t('You may not post an update to case #%nid. Either you do not have the necessary permissions or the case has been locked.', array('%nid' => $nid)));
   return 0;
@@ -312,7 +314,7 @@ function _casetracker_actions_update_by_comment($field, $value, $node) {
  */
 function _casetracker_actions_log($field, $value, $nid) {
   watchdog('action', 'Case nid %nid: %field set to %value.',
-    array('%field'=>$field, '%value'=>$value, '%nid'=>$nid));
+    array('%field' => $field, '%value' => $value, '%nid' => $nid));
 
   drupal_set_message(t("Case #%nid: %field set to %value", array('%nid' => $nid, '%field' => $field, '%value' => $value)));
 }

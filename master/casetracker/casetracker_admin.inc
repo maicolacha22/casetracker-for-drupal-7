@@ -37,18 +37,19 @@ function casetracker_settings() {
   foreach (array('priority', 'status', 'type') as $realm) {
     $options = casetracker_realm_load($realm);
     $temp_keys = array_keys($options);
-    $form['casetracker_general']['casetracker_default_case_'. $realm] = array(
+    $form['casetracker_general']['casetracker_default_case_' . $realm] = array(
       '#type' => 'select',
       '#options' => $options,
       '#title' => t('Default case %realm', array('%realm' => $realm)),
-      '#default_value' => variable_get('casetracker_default_case_'. $realm, array_shift($temp_keys)),
+      '#default_value' => variable_get('casetracker_default_case_' . $realm, array_shift($temp_keys)),
       '#description' => t('%realm to be assigned the case if one is not explicitly defined.', array('%realm' => ucfirst($realm))),
     );
-  };
+  }
 
   $node_types = node_type_get_names();
 
-  $project_types = $node_types; unset($project_types['casetracker_basic_case']);
+  $project_types = $node_types;
+  unset($project_types['casetracker_basic_case']);
   $form['casetracker_general']['casetracker_project_node_types'] = array(
     '#type' => 'checkboxes',
     '#title' => t('Project node types'),
@@ -57,7 +58,8 @@ function casetracker_settings() {
     '#description' => t('Select the node types that will be considered Case Tracker projects.'),
   );
 
-  $case_types = $node_types; unset($case_types['casetracker_basic_project']);
+  $case_types = $node_types;
+  unset($case_types['casetracker_basic_project']);
   $form['casetracker_general']['casetracker_case_node_types'] = array(
     '#type' => 'checkboxes',
     '#title' => t('Case node types'),
@@ -65,14 +67,15 @@ function casetracker_settings() {
     '#default_value' => variable_get('casetracker_case_node_types', array('casetracker_basic_case')),
     '#description' => t('Select the node types that will be considered Case Tracker cases.'),
   );
-  
+
   $all_views = views_get_all_views();
   $node_views = array();
   $user_views = array();
-  foreach($all_views AS $view) {
-    if($view->base_table == 'node') {
+  foreach ($all_views as $view) {
+    if ($view->base_table == 'node') {
       $node_views[$view->name] = $view->name;
-    } else if($view->base_table = 'users') {
+    }
+    else if ($view->base_table = 'users') {
       $user_views[$view->name] = $view->name;
     }
   }
@@ -83,7 +86,7 @@ function casetracker_settings() {
     '#default_value' => variable_get('casetracker_view_project_options', 'casetracker_project_options'),
     '#description' => t('Select the view from which to fill the project selector on the add case page.'),
   );
-  
+
   $form['casetracker_general']['casetracker_view_assignee_options'] = array(
     '#type' => 'select',
     '#title' => t('Assignee options view'),
@@ -91,7 +94,7 @@ function casetracker_settings() {
     '#default_value' => variable_get('casetracker_view_assignee_options', 'casetracker_assignee_options'),
     '#description' => t('Select the view from which to fill the user assignment options on the add case page.'),
   );
-  
+
   $form['#submit'][] = 'casetracker_settings_submit';
   return system_settings_form($form);
 }
@@ -143,10 +146,14 @@ function casetracker_case_state_edit($form, $form_state, $case_state = NULL) {
   $form['case_state']['realm'] = array(
     '#type' => 'select',
     '#title' => t('State realm'),
-    '#required'  => TRUE,
+    '#required' => TRUE,
     '#default_value' => isset($case_state) ? $case_state->realm : NULL,
     '#description' => t('The realm in which this case state will appear.'),
-    '#options' => array('priority' => t('priority'), 'status' => t('status'), 'type' => t('type')),
+    '#options' => array(
+      'priority' => t('priority'),
+      'status' => t('status'),
+      'type' => t('type'),
+    ),
   );
   $form['case_state']['weight'] = array(
     '#type' => 'weight',
@@ -155,16 +162,16 @@ function casetracker_case_state_edit($form, $form_state, $case_state = NULL) {
     '#description' => t('States are ordered first by weight and then by state name.'),
   );
 
-  if ($case_state) { 
+  if ($case_state) {
     $form['csid'] = array(
-      '#type' => 'value', 
+      '#type' => 'value',
       '#value' => $case_state->csid,
-    ); 
+    );
   }
   $form['submit'] = array(
-    '#type' => 'submit', 
+    '#type' => 'submit',
     '#value' => t('Submit'), // this text is an easter egg.
-  ); 
+  );
 
   return $form;
 }
@@ -173,21 +180,23 @@ function casetracker_case_state_edit($form, $form_state, $case_state = NULL) {
  * Displays an administrative overview of all case states available.
  */
 function casetracker_case_state_overview() {
-  $rows = array(); 
+  $rows = array();
   $headers = array(
-    t('Name'), 
-    t('Realm'), 
+    t('Name'),
+    t('Realm'),
     array(
-      'data' => t('Operations'), 
-      'colspan' => 2)
-    );
+      'data' => t('Operations'),
+      'colspan' => 2,
+    ),
+  );
   foreach (array('priority', 'status', 'type') as $realm) {
     foreach (casetracker_realm_load($realm, FALSE) as $csid => $name) {
       $rows[] = array(
         check_plain($name),
         $realm,
-        l(t('edit'), 'admin/settings/casetracker/states/edit/'. $csid),
-        l(t('delete'), 'admin/settings/casetracker/states/delete/'. $csid), );
+        l(t('edit'), 'admin/settings/casetracker/states/edit/' . $csid),
+        l(t('delete'), 'admin/settings/casetracker/states/delete/' . $csid),
+      );
     }
   }
 
@@ -199,7 +208,7 @@ function casetracker_case_state_overview() {
  */
 function casetracker_case_state_edit_submit($form, &$form_state) {
   $case_state = array(
-    'name' => $form_state['values']['name'], 
+    'name' => $form_state['values']['name'],
     'realm' => $form_state['values']['realm'],
     'weight' => $form_state['values']['weight'],
   );
@@ -207,11 +216,11 @@ function casetracker_case_state_edit_submit($form, &$form_state) {
   if (!empty($form_state['values']['csid'])) {
     // Update
     $case_state['csid'] = $form_state['values']['csid'];
-    drupal_set_message(t('The case state %name has been updated.', array('%name' =>  $form_state['values']['name'])));
+    drupal_set_message(t('The case state %name has been updated.', array('%name' => $form_state['values']['name'])));
   }
   else {
     // Create
-    drupal_set_message(t('The case state %name has been created.', array('%name' =>  $form_state['values']['name'])));
+    drupal_set_message(t('The case state %name has been created.', array('%name' => $form_state['values']['name'])));
   }
   casetracker_case_state_save($case_state);
   $form_state['redirect'] = 'admin/settings/casetracker/states';
@@ -223,8 +232,14 @@ function casetracker_case_state_edit_submit($form, &$form_state) {
 function casetracker_case_state_confirm_delete($form, &$form_state, $case_state) {
   if (!empty($case_state)) {
     $form = array(
-      'csid' => array('#type' => 'value', '#value' => $case_state->csid),
-      'name' => array('#type' => 'value', '#value' => $case_state->name),
+      'csid' => array(
+        '#type' => 'value',
+        '#value' => $case_state->csid,
+      ),
+      'name' => array(
+        '#type' => 'value',
+        '#value' => $case_state->name,
+      ),
     );
     return confirm_form($form,
                         t('Are you sure you want to delete the case state %name?', array('%name' => $case_state->name)),
@@ -236,7 +251,7 @@ function casetracker_case_state_confirm_delete($form, &$form_state, $case_state)
  * Ayup, the user definitely wants to delete this case state.
  */
 function casetracker_case_state_confirm_delete_submit($form, &$form_state) {
-  drupal_set_message(t('Deleted case state %name.', array('%name' =>  $form_state['values']['name'])));
+  drupal_set_message(t('Deleted case state %name.', array('%name' => $form_state['values']['name'])));
   casetracker_case_state_delete($form_state['values']['csid']);
   $form_state['redirect'] = 'admin/settings/casetracker/states';
 }

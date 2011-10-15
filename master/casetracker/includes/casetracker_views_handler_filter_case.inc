@@ -3,8 +3,8 @@
  * Filter to only show casetracker cases.
  */
 class casetracker_views_handler_filter_case extends views_handler_filter {
-  function query() {    
-    $case_types = array_filter(variable_get('casetracker_case_node_types', array('casetracker_basic_case'))); 
+  function query() {
+    $case_types = array_filter(variable_get('casetracker_case_node_types', array('casetracker_basic_case')));
 
     if (!empty($case_types)) {
       $placeholders = db_placeholders($case_types, 'varchar');

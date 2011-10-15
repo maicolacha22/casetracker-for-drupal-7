@@ -9,7 +9,7 @@ class CasetrackerAdminTest extends DrupalWebTestCase {
     return array(
       'name' => t('Case state CRUD.'),
       'description' => t('Create, edit, update and delete case states'),
-      'group' => t('Case Tracker')
+      'group' => t('Case Tracker'),
     );
   }
 
