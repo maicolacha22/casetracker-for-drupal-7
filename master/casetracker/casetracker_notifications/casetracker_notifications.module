@@ -2,7 +2,7 @@
 
 
 /**
- * Implementation of hook_menu().
+ * Implements hook_menu().
  */
 function casetracker_notifications_menu() {
   // User pages, will be disabled by default
@@ -18,7 +18,7 @@ function casetracker_notifications_menu() {
 }
 
 /**
- * Implementation of hook_perm().
+ * Implements hook_perm().
  */
 function casetracker_notifications_permission() {
   return array(
@@ -30,7 +30,7 @@ function casetracker_notifications_permission() {
 }
 
 /**
- * Implementation of hook_notifications()
+ * Implements hook_notifications().
  */
 function casetracker_notifications_notifications($op) {
   switch ($op) {
@@ -73,7 +73,7 @@ function casetracker_notifications_notifications($op) {
 }
 
 /**
- * Implementation of hook_notifications_object_node()
+ * Implements hook_notifications_object_node().
  */
 function casetracker_notifications_notifications_object_node($op, $node, $account = NULL) {
   switch ($op) {

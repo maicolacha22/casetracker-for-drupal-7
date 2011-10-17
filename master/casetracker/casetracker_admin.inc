@@ -3,7 +3,7 @@
 /**
  * Configures the various Case Tracker options; system_settings_form().
  */
-function casetracker_settings() {
+function casetracker_settings($form, &$form_state) {
   $form = array();
 
   $form['casetracker_general'] = array(
@@ -181,26 +181,34 @@ function casetracker_case_state_edit($form, $form_state, $case_state = NULL) {
  */
 function casetracker_case_state_overview() {
   $rows = array();
-  $headers = array(
+  $header = array(
     t('Name'),
     t('Realm'),
     array(
       'data' => t('Operations'),
       'colspan' => 2,
     ),
-  );
+  );  
+
   foreach (array('priority', 'status', 'type') as $realm) {
     foreach (casetracker_realm_load($realm, FALSE) as $csid => $name) {
       $rows[] = array(
         check_plain($name),
         $realm,
-        l(t('edit'), 'admin/settings/casetracker/states/edit/' . $csid),
-        l(t('delete'), 'admin/settings/casetracker/states/delete/' . $csid),
+        l(t('edit'), 'admin/config/casetracker/states/edit/' . $csid),
+        l(t('delete'), 'admin/config/casetracker/states/delete/' . $csid),
       );
     }
   }
 
-  return theme('table', array('headers' => $headers, 'rows' => $rows));
+  $build = array();
+  $build['table'] = array(
+    '#theme' => 'table',
+    '#header' => $header,
+    '#rows' => $rows,
+  );
+
+  return $build;
 }
 
 /**
@@ -223,7 +231,7 @@ function casetracker_case_state_edit_submit($form, &$form_state) {
     drupal_set_message(t('The case state %name has been created.', array('%name' => $form_state['values']['name'])));
   }
   casetracker_case_state_save($case_state);
-  $form_state['redirect'] = 'admin/settings/casetracker/states';
+  $form_state['redirect'] = 'admin/config/casetracker/states';
 }
 
 /**
@@ -243,7 +251,7 @@ function casetracker_case_state_confirm_delete($form, &$form_state, $case_state)
     );
     return confirm_form($form,
                         t('Are you sure you want to delete the case state %name?', array('%name' => $case_state->name)),
-                        'admin/settings/casetracker/states', t('This action can not be undone.'), t('Delete'), t('Cancel'));
+                        'admin/config/casetracker/states', t('This action can not be undone.'), t('Delete'), t('Cancel'));
   }
 }
 
@@ -253,5 +261,5 @@ function casetracker_case_state_confirm_delete($form, &$form_state, $case_state)
 function casetracker_case_state_confirm_delete_submit($form, &$form_state) {
   drupal_set_message(t('Deleted case state %name.', array('%name' => $form_state['values']['name'])));
   casetracker_case_state_delete($form_state['values']['csid']);
-  $form_state['redirect'] = 'admin/settings/casetracker/states';
+  $form_state['redirect'] = 'admin/config/casetracker/states';
 }

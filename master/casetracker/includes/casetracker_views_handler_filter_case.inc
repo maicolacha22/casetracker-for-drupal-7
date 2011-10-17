@@ -15,7 +15,7 @@ class casetracker_views_handler_filter_case extends views_handler_filter {
       $this->query->add_where($this->options['group'], "FALSE");
       $msg = t('You have no node types which are acting as cases.');
       if (user_access('administer case tracker')) {
-        $msg .= ' ' . l(t('Configure case tracker.'), 'admin/settings/casetracker');
+        $msg .= ' ' . l(t('Configure case tracker.'), 'admin/config/casetracker');
       }
       drupal_set_message($msg, 'warning');
     }

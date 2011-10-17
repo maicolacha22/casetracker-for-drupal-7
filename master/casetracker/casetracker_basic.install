@@ -1,11 +1,29 @@
 <?php
+/**
+ * @file
+ * Install, update and uninstall functions for the casetracker module.
+ *
+ */
+
 
 /**
- * Implementation of hook_uninstall().
+ * Implements hook_uninstall().
  */
 function casetracker_basic_uninstall() {
-  db_query("DELETE FROM {node} WHERE type = 'casetracker_basic_project'");
-  db_query("DELETE FROM {node} WHERE type = 'casetracker_basic_case'");
-  db_query("DELETE FROM {node_type} WHERE type = 'casetracker_basic_project'");
-  db_query("DELETE FROM {node_type} WHERE type = 'casetracker_basic_case'");
+  db_delete('node')
+  ->condition('type', 'casetracker_basic_project')
+  ->execute();
+
+  db_delete('node')
+  ->condition('type', 'casetracker_basic_case')
+  ->execute();
+
+  db_delete('node_type')
+  ->condition('type', 'casetracker_basic_project')
+  ->execute();
+
+  db_delete('node_type')
+  ->condition('type', 'casetracker_basic_case')
+  ->execute();
 }
+

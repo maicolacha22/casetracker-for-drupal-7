@@ -1,7 +1,13 @@
 <?php
+/**
+ * @file
+ * Install, update and uninstall functions for the casetracker module.
+ *
+ */
+
 
 /**
- * Implementation of hook_schema().
+ * Implements hook_schema().
  */
 function casetracker_schema() {
   $schema['casetracker_case'] = array(
@@ -158,7 +164,7 @@ function casetracker_schema() {
 }
 
 /**
- * Implementation of hook_install().
+ * Implements hook_install().
  */
 function casetracker_install() {
   // Create default case states.
@@ -231,12 +237,9 @@ function casetracker_install() {
 }
 
 /**
- * Implementation of hook_uninstall().
+ * Implements hook_uninstall().
  */
 function casetracker_uninstall() {
-  // Remove tables.
-  drupal_uninstall_schema('casetracker');
-
   // Delete variables
   variable_del('casetracker_default_assign_to');
   variable_del('casetracker_default_case_priority');
@@ -244,26 +247,4 @@ function casetracker_uninstall() {
   variable_del('casetracker_default_case_type');
   variable_del('casetracker_project_node_types');
   variable_del('casetracker_case_node_types');
-
-  // ...and also delete variables from old versions.
-  variable_del('casetracker_default_case_state');
-  variable_del('casetracker_current_case_numbers');
-  variable_del('casetracker_current_project_number');
-}
-
-/**
- * Implementation of hook_update_N
- */
-function casetracker_update_6001() {
-  variable_del('casetracker_current_project_number');
-  variable_del('casetracker_current_case_numbers');
-}
-
-/**
- * Add an index to the casetracker_comment_status table;
- */
-function casetracker_update_6002() {
-  $ret = array();
-  $ret[] = update_sql("ALTER TABLE {casetracker_comment_status} ADD INDEX cid (cid)");
-  return $ret;
 }

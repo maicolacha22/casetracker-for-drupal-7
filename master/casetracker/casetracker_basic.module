@@ -6,14 +6,14 @@
  */
 
 /**
- * Implementation of hook_permission().
+ * Implements hook_permission().
  */
 function casetracker_basic_permission() {
   return array('create projects', 'create cases', 'edit own projects', 'edit own cases');
 }
 
 /**
- * Implementation of hook_node_info().
+ * Implements hook_node_info().
  */
 function casetracker_basic_node_info() {
   return array(
@@ -35,12 +35,12 @@ function casetracker_basic_node_info() {
 }
 
 /**
- * Implementation of hook_form().
+ * Implements hook_form().
  */
 function casetracker_basic_project_form(&$node) {
   $form = array();
   if (casetracker_is_project($node->type)) {
-    $type = node_get_types('type', $node);
+    $type = node_type_get_type($node);
     $form['title'] = array(
       '#type' => 'textfield',
       '#title' => check_plain($type->title_label),
@@ -54,12 +54,12 @@ function casetracker_basic_project_form(&$node) {
 }
 
 /**
- * Implementation of hook_form().
+ * Implements hook_form().
  */
 function casetracker_basic_case_form(&$node) {
   $form = array();
   if (casetracker_is_case($node->type)) {
-    $type = node_get_types('type', $node);
+    $type = node_type_get_type($node);
     $form['title'] = array(
       '#type' => 'textfield',
       '#title' => check_plain($type->title_label),
@@ -73,7 +73,7 @@ function casetracker_basic_case_form(&$node) {
 }
 
 /**
- *  Implementation of hook_node_access().
+ * Implements hook_node_access().
  */
 function casetracker_basic_project_node_access($node, $op, $account) {
   switch ($op) {
@@ -90,7 +90,7 @@ function casetracker_basic_project_node_access($node, $op, $account) {
 }
 
 /**
- * Implementation of hook_node_access().
+ * Implements hook_node_access().
  */
 function casetracker_basic_case_node_access($node, $op) {
   global $user;

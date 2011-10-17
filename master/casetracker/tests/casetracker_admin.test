@@ -35,7 +35,7 @@ class CasetrackerAdminTest extends DrupalWebTestCase {
         'name' => $this->randomName(32),
         'realm' => $realm,
       );
-      $this->drupalPost('admin/settings/casetracker/states/add', $edit, t('Submit'));
+      $this->drupalPost('admin/config/casetracker/states/add', $edit, t('Submit'));
       $text = t('The case state !name has been created', array('!name' => $edit['name']));
       $this->assertText($text);
     }
@@ -48,7 +48,7 @@ class CasetrackerAdminTest extends DrupalWebTestCase {
       $edit = array(
         'name' => $this->randomName(32),
       );
-      $this->drupalPost('admin/settings/casetracker/states/edit/' . $csid, $edit, t('Submit'));
+      $this->drupalPost('admin/config/casetracker/states/edit/' . $csid, $edit, t('Submit'));
       $text = t('The case state !name has been updated', array('!name' => $edit['name']));
       $this->assertText($text);
     }
@@ -61,7 +61,7 @@ class CasetrackerAdminTest extends DrupalWebTestCase {
       $states = casetracker_realm_load($realm);
       $csid = array_pop(array_keys($states));
 
-      $this->drupalPost('admin/settings/casetracker/states/delete/' . $csid, array(), t('Delete'));
+      $this->drupalPost('admin/config/casetracker/states/delete/' . $csid, array(), t('Delete'));
       $text = t('Deleted case state !name', array('!name' => $states[$csid]));
       $this->assertText($text);
     }

@@ -6,47 +6,47 @@
  */
 
 /**
- * Implementation of hook_action_info()
+ * Implements hook_action_info().
  * Used to define new actions:
  *   set priority, set status, set type, set project, set assign-to, take case.
  */
 function casetracker_actions_action_info() {
   return array(
     'casetracker_actions_set_priority_action' => array(
-      'description' => t('Set case priority'),
+      'label' => t('Set case priority'),
       'type' => 'node',
       'configurable' => TRUE,
-      'hooks' => array('any' => TRUE), // this is a sloppy cheat.
+      'triggers' => array('any' => TRUE), // this is a sloppy cheat.
     ),
     'casetracker_actions_set_status_action' => array(
-      'description' => t('Set case status'),
+      'label' => t('Set case status'),
       'type' => 'node',
       'configurable' => TRUE,
-      'hooks' => array('any' => TRUE),
+      'triggers' => array('any' => TRUE),
     ),
     'casetracker_actions_set_type_action' => array(
-      'description' => t('Set case type'),
+      'label' => t('Set case type'),
       'type' => 'node',
       'configurable' => TRUE,
-      'hooks' => array('any' => TRUE),
+      'triggers' => array('any' => TRUE),
     ),
     'casetracker_actions_set_assign_to_action' => array(
-      'description' => t('Set case assigned user'),
+      'label' => t('Set case assigned user'),
       'type' => 'node',
       'configurable' => TRUE,
-      'hooks' => array('any' => TRUE),
+      'triggers' => array('any' => TRUE),
     ),
     'casetracker_actions_set_project_action' => array(
-      'description' => t('Set case project'),
+      'label' => t('Set case project'),
       'type' => 'node',
       'configurable' => TRUE,
-      'hooks' => array('any' => TRUE),
+      'triggers' => array('any' => TRUE),
     ),
     'casetracker_actions_take_case_action' => array(
-      'description' => t('Take over case'),
+      'label' => t('Take over case'),
       'type' => 'node',
       'configurable' => FALSE,
-      'hooks' => array('any' => TRUE),
+      'triggers' => array('any' => TRUE),
     ),
   );
 }
@@ -126,6 +126,10 @@ function casetracker_actions_set_priority_action_form($context) {
   return $form;
 }
 
+/**
+ * @todo Please document this function.
+ * @see http://drupal.org/node/1354
+ */
 function casetracker_actions_set_priority_action_submit($form, $form_state) {
   return array('priority' => $form_state['values']['casetracker_actions_priority']);
 }
@@ -148,6 +152,10 @@ function casetracker_actions_set_status_action_form($context) {
   return $form;
 }
 
+/**
+ * @todo Please document this function.
+ * @see http://drupal.org/node/1354
+ */
 function casetracker_actions_set_status_action_submit($form, $form_state) {
   return array('status' => $form_state['values']['casetracker_actions_status']);
 }
@@ -169,6 +177,10 @@ function casetracker_actions_set_type_action_form($context) {
   return $form;
 }
 
+/**
+ * @todo Please document this function.
+ * @see http://drupal.org/node/1354
+ */
 function casetracker_actions_set_type_action_submit($form, $form_state) {
   return array('type' => $form_state['values']['casetracker_actions_type']);
 }
@@ -203,6 +215,10 @@ function casetracker_actions_set_assign_to_action_form($context) {
   return $form;
 }
 
+/**
+ * @todo Please document this function.
+ * @see http://drupal.org/node/1354
+ */
 function casetracker_actions_set_assign_to_action_submit($form, $form_state) {
   return array('assign_to' => $form_state['values']['casetracker_actions_assign_to']);
 }
@@ -232,6 +248,10 @@ function casetracker_actions_set_project_action_form($context) {
   return $form;
 }
 
+/**
+ * @todo Please document this function.
+ * @see http://drupal.org/node/1354
+ */
 function casetracker_actions_set_project_action_submit($form, $form_state) {
   return array('project' => $form_state['values']['casetracker_actions_pid']);
 }
@@ -249,7 +269,7 @@ function _casetracker_actions_act($nid, $field, $value) {
     return;
   }
   // make sure we have a valid case node
-  $node = node_load(array('nid' => $nid, 'type' => 'casetracker_basic_case'));
+  $node = node_load($nid);
 
   $success = _casetracker_actions_update_by_comment(
     $field, $value, $node);
