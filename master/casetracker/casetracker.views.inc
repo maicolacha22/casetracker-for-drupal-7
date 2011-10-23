@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Implementation of hook_views_data().
+ * Implements hook_views_data().
  */
 function casetracker_views_data() {
   $data = array();
@@ -14,6 +14,10 @@ function casetracker_views_data() {
 }
 
 // ---------- Table casetracker_case
+/**
+ * @todo Please document this function.
+ * @see http://drupal.org/node/1354
+ */
 function casetracker_views_data_casetracker_case() {
   $data['casetracker_case']['table']['group']  = t('Case Tracker');
   $data['casetracker_case']['table']['join'] = array(
@@ -135,6 +139,10 @@ function casetracker_views_data_casetracker_case() {
   return $data;
 }
 
+/**
+ * @todo Please document this function.
+ * @see http://drupal.org/node/1354
+ */
 function casetracker_views_data_casetracker_case_states() {
   $data['casetracker_case_states']['table']['group']  = t('Case Tracker');
   $data['casetracker_case_states']['table']['join'] = array(
@@ -156,7 +164,7 @@ function casetracker_views_data_casetracker_case_states() {
 }
 
 /**
- * Implementation of hook_views_data_alter().
+ * Implements hook_views_data_alter().
  */
 function casetracker_views_data_alter(&$data) {
   $data['node']['case'] = array(
@@ -175,73 +183,3 @@ function casetracker_views_data_alter(&$data) {
   );
 }
 
-/**
- * Implementation of hook_views_handlers().
- */
-function casetracker_views_handlers() {
-  return array(
-    'info' => array(
-      'path' => drupal_get_path('module', 'casetracker') . '/includes',
-    ),
-    'handlers' => array(
-      // ---------- Fields ----------
-      // fields: casetracker_case
-      'casetracker_views_handler_field_project_name' => array(
-        'parent' => 'views_handler_field',
-      ),
-      'casetracker_views_handler_field_user_name' => array(
-        'parent' => 'views_handler_field',
-      ),
-      'casetracker_views_handler_field_priority_name' => array(
-        'parent' => 'views_handler_field',
-      ),
-      'casetracker_views_handler_field_status_name' => array(
-        'parent' => 'views_handler_field',
-      ),
-      'casetracker_views_handler_field_type_name' => array(
-        'parent' => 'views_handler_field',
-      ),
-      'casetracker_views_handler_field_case_count' => array(
-        'parent' => 'views_handler_field',
-      ),
-      // ---------- Filters ----------
-      // filters: casetracker_case
-      'casetracker_views_handler_filter_user_options' => array(
-        'parent' => 'views_handler_filter_many_to_one',
-      ),
-      'casetracker_views_handler_filter_priority_options' => array(
-        'parent' => 'views_handler_filter_many_to_one',
-      ),
-      'casetracker_views_handler_filter_status_options' => array(
-        'parent' => 'views_handler_filter_many_to_one',
-      ),
-      'casetracker_views_handler_filter_type_options' => array(
-        'parent' => 'views_handler_filter_many_to_one',
-      ),
-      'casetracker_views_handler_filter_project_options' => array(
-        'parent' => 'views_handler_filter_many_to_one',
-      ),
-      // arguments: casetracker_case
-      'casetracker_views_handler_argument_status' => array(
-        'parent' => 'views_handler_argument_numeric',
-      ),
-      'casetracker_views_handler_argument_priority' => array(
-        'parent' => 'views_handler_argument_numeric',
-      ),
-      'casetracker_views_handler_argument_type' => array(
-        'parent' => 'views_handler_argument_numeric',
-      ),
-      // filters: casetracker_project
-      'casetracker_views_handler_filter_project_published' => array(
-        'parent' => 'views_handler_filter_equality',
-      ),
-      // filters: node-type
-      'casetracker_views_handler_filter_case' => array(
-        'parent' => 'views_handler_filter',
-      ),
-      'casetracker_views_handler_filter_project' => array(
-        'parent' => 'views_handler_filter',
-      ),
-    ),
-  );
-}

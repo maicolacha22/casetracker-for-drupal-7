@@ -91,6 +91,8 @@ function _view_casetracker_project_options() {
     'perm' => 'access content',
   ));
   $handler->override_option('items_per_page', 0);
+
+dpm($view);
   return $view;
 }
 
@@ -195,7 +197,7 @@ function _view_casetracker_assignee_options() {
 function _view_casetracker_project_cases() {
   $view = new view;
   $view->name = 'casetracker_project_cases';
-  $view->description = 'Case Tracker > Cases by project page';
+  $view->description = t('Case Tracker > Cases by project page');
   $view->tag = 'casetracker';
   $view->view_php = '';
   $view->base_table = 'node';
@@ -420,8 +422,8 @@ function _view_casetracker_project_cases() {
         'operator' => 'pid_op',
         'identifier' => 'pid',
         'label' => 'Project',
-        'optional' => 1,
-        'single' => 1,
+        'required' => 0,
+        'multiple' => 0,
         'remember' => 0,
         'reduce' => 0,
       ),
@@ -441,8 +443,8 @@ function _view_casetracker_project_cases() {
         'operator' => 'case_type_id_op',
         'identifier' => 'case_type_id',
         'label' => 'Type',
-        'optional' => 1,
-        'single' => 0,
+        'required' => 0,
+        'multiple' => 1,
         'remember' => 0,
         'reduce' => 0,
       ),
@@ -465,8 +467,8 @@ function _view_casetracker_project_cases() {
         'operator' => 'case_priority_id_op',
         'identifier' => 'case_priority_id',
         'label' => 'Priority',
-        'optional' => 1,
-        'single' => 0,
+        'required' => 0,
+        'multiple' => 1,
         'remember' => 0,
         'reduce' => 0,
       ),
@@ -489,8 +491,8 @@ function _view_casetracker_project_cases() {
         'operator' => 'case_status_id_op',
         'identifier' => 'case_status_id',
         'label' => 'Status',
-        'optional' => 1,
-        'single' => 0,
+        'required' => 0,
+        'multiple' => 1,
         'remember' => 0,
         'reduce' => 0,
       ),
@@ -751,8 +753,8 @@ function _view_casetracker_project_cases() {
         'operator' => 'pid_op',
         'identifier' => 'pid',
         'label' => 'Project',
-        'optional' => 1,
-        'single' => 1,
+        'required' => 0,
+        'multiple' => 0,
         'remember' => 0,
         'reduce' => 0,
       ),
@@ -772,8 +774,8 @@ function _view_casetracker_project_cases() {
         'operator' => 'case_type_id_op',
         'identifier' => 'case_type_id',
         'label' => 'Type',
-        'optional' => 1,
-        'single' => 0,
+        'required' => 0,
+        'multiple' => 1,
         'remember' => 0,
         'reduce' => 0,
       ),
@@ -796,8 +798,8 @@ function _view_casetracker_project_cases() {
         'operator' => 'case_priority_id_op',
         'identifier' => 'case_priority_id',
         'label' => 'Priority',
-        'optional' => 1,
-        'single' => 0,
+        'required' => 0,
+        'multiple' => 1,
         'remember' => 0,
         'reduce' => 0,
       ),
@@ -820,8 +822,8 @@ function _view_casetracker_project_cases() {
         'operator' => 'case_status_id_op',
         'identifier' => 'case_status_id',
         'label' => 'Status',
-        'optional' => 1,
-        'single' => 0,
+        'required' => 0,
+        'multiple' => 1,
         'remember' => 0,
         'reduce' => 0,
       ),

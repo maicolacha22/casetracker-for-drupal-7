@@ -8,7 +8,13 @@
 class casetracker_views_handler_field_project_name extends views_handler_field {
 
   function render($values) {
-    $node = db_fetch_object(db_query(db_rewrite_sql("SELECT n.nid, n.title FROM {node} n WHERE n.nid = %d"), $values->{$this->field_alias}));
+    $node = db_select('node', 'n')
+      ->fields('n', array('nid', 'title'))
+      //->condition('n.nid', $values->{$this->field_alias})
+      ->condition('n.nid', $values->$this->field_alias)
+      ->addTag('views')
+      ->execute();
+dpm($node);
     if ($node->nid) {
       return l($node->title, "node/$node->nid");
     } // returns a linked case tracker project title.

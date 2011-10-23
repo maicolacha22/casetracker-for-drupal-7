@@ -25,7 +25,6 @@ function casetracker_help($path, $arg) {
       return '<p>' . t('You may add a new case state below.') . '</p>';
     case 'admin/config/casetracker/states/edit/' . arg(4):
       return '<p>' . t('You may edit an existing case state below.') . '</p>';
-
   }
 }
 
@@ -131,9 +130,9 @@ function casetracker_menu() {
 function casetracker_node_delete($node) {
   if (casetracker_is_case($node->type)) {
     // delete case and its comments.
-    $comment_results = db_select('comments')
-      ->fields('cid')
-      ->condition('nid', $node->nid)
+    $comment_results = db_select('comments', 'c')
+      ->fields('c', array('cid'))
+      ->condition('c.nid', $node->nid)
       ->execute();
     foreach ($comment_results as $comment_result) {
       db_delete('casetracker_comment_status')
@@ -145,17 +144,17 @@ function casetracker_node_delete($node) {
       ->execute();
   } else if (casetracker_is_project($node->type)) {
     // projects: delete all the cases under the project and all the comments under each case.
-    $case_results = db_select('casetracker_case')
-      ->fields('nid')
-      ->condition('pid', $node->nid)
+    $case_results = db_select('casetracker_case', 'c')
+      ->fields('c', array('nid'))
+      ->condition('c.pid', $node->nid)
       ->execute();
     foreach ($case_results as $case_result) {
       db_delete('casetracker_case')
         ->condition('nid', $case_result->nid)
         ->execute();
-      $comment_results = db_select('comments')
-        ->fields('cid')
-        ->condition('nid', $case_result->nid)
+      $comment_results = db_select('comments', 'c')
+        ->fields('c', array('cid'))
+        ->condition('c.nid', $case_result->nid)
         ->execute();
       foreach ($comment_results as $comment_result) {
         db_delete('casetracker_comment_status')
@@ -196,14 +195,16 @@ function casetracker_node_insert($node) {
  * Implements hook_node_load().
  */
 function casetracker_node_load($nodes, $types) {
-  if (casetracker_is_case($node->type)) {
-    $casetracker = db_select('casetracker_case')
-      ->fields('n', array('pid', 'case_priority_id', 'case_type_id', 'assign_to', 'case_status_id'))
-      ->condition('nid', $node->nid)
-      ->condition('vid', $node->vid)
-      ->execute();
-    if ($casetracker) {
-      return array('casetracker' => $casetracker);
+  foreach ($nodes as $node) {
+    if (casetracker_is_case($node->type)) {
+      $casetracker = db_select('casetracker_case', 'c')
+        ->fields('c', array('pid', 'case_priority_id', 'case_type_id', 'assign_to', 'case_status_id'))
+        ->condition('c.nid', $node->nid)
+        ->condition('c.vid', $node->vid)
+        ->execute();
+      if ($casetracker) {
+        return array('casetracker' => $casetracker);
+      }
     }
   }
 }
@@ -236,7 +237,7 @@ function casetracker_node_view($node, $view_mode, $langcode) {
     // used in the breadcrumb and our theme function, mostly for nid and project number display.
     $project = node_load($node->casetracker->pid);
 
-    if ($page) {
+    if ($view_mode == "full") {
       $trail = array(
         l(t('Home'), NULL),
         l(t('Case Tracker'), 'casetracker/projects'),
@@ -247,11 +248,14 @@ function casetracker_node_view($node, $view_mode, $langcode) {
     }
 
     $node->content['casetracker_case_summary'] = array(
-      '#value' => theme('casetracker_case_summary', $node, $project),
+      //'#value' => theme('casetracker_case_summary', $node, $project),
+      '#theme' => 'casetracker_case_summary',
+      '#case' => $node,
+      '#project' => $project,
       '#weight' => -10,
     );
   } else if (casetracker_is_project($node->type)) {
-    if ($page) {
+    if ($view_mode == "full") {
       $trail = array(
         l(t('Home'), NULL),
         l(t('Case Tracker'), 'casetracker/projects'),
@@ -260,7 +264,9 @@ function casetracker_node_view($node, $view_mode, $langcode) {
     }
 
     $node->content['casetracker_project_summary'] = array(
-      '#value' => theme('casetracker_project_summary', $node),
+      '#theme' => 'casetracker_project_summary',
+      '#project' => $node,
+      //'#value' => theme('casetracker_project_summary', array('project' => $node)),
       '#weight' => -10,
     );
   }
@@ -365,16 +371,16 @@ function casetracker_comment_view($comment) {
     $case_data['old'] = drupal_clone($case->casetracker);
   }
   else {
-    $results = db_select('casetracker_comment_status')
-      ->fields('cid')
-      ->condition('cid', $comment->cid)
+    $results = db_select('casetracker_comment_status', 'c')
+      ->fields('c', array('cid'))
+      ->condition('c.cid', $comment->cid)
       ->execute();
     foreach ($results as $result) {
       $state = $result->state ? 'new' : 'old';
       $case_data[$state] = $result;
     }
   }
-  $comment->comment = theme('casetracker_comment_changes', $case_data['old'], $case_data['new']) . $comment->comment;
+  $comment->comment = theme('casetracker_comment_changes', array('old' => $case_data['old'], 'new' => $case_data['new'] . $comment->comment));
 }
 
 /**
@@ -609,10 +615,10 @@ function casetracker_block_jump_to_case_number($form) {
  */
 function casetracker_block_jump_to_case_number_submit($form, $form_state) {
   list($pid, $nid) = explode('-', $form_state['values']['case_number']);
-  $case_nid = db_select('casetracker_case')
-    ->fields('u', array('uid', 'name', 'status', 'created', 'access'))
-    ->condition('pid', $pid)
-    ->condition('nid', $nid)
+  $case_nid = db_select('casetracker_case', 'c')
+    ->fields('c', array('uid', 'name', 'status', 'created', 'access'))
+    ->condition('c.pid', $pid)
+    ->condition('c.nid', $nid)
     ->execute()
     ->fetchField();
   if (!$case_nid) {
@@ -647,8 +653,15 @@ function casetracker_case_state_load($csid = NULL, $realm = NULL, $reset = FALSE
   static $states_lookup;
 
   if (!$states_lookup || $reset) {
-    $results = db_query("SELECT csid, case_state_name AS name, case_state_realm AS realm, weight
-                         FROM {casetracker_case_states} ORDER BY weight");
+    $results = db_select('casetracker_case_states', 'c');
+    $results->addField('c', 'csid');
+    $results->addField('c', 'case_state_name', 'name');
+    $results->addField('c', 'case_state_realm', 'realm');
+    $results->addField('c', 'weight');
+    $results->orderBy('c.weight');
+    $results = $results->execute();
+
+    $types = node_type_get_types();
     $states_lookup = array();
     foreach ($results as $row) {
       $row->display = casetracker_tt("case_states:$row->csid:name", $row->name);
@@ -703,7 +716,11 @@ function casetracker_locale($op = 'groups', $group = NULL) {
  * Refresh locale strings.
  */
 function casetracker_locale_refresh() {
-  $results = db_query("SELECT csid, case_state_name AS name, case_state_realm AS realm FROM {casetracker_case_states}");
+  $results = db_select('casetracker_case_states', 'c')
+      ->addField('c', 'csid')
+      ->addField('c', 'case_state_name', 'name')
+      ->addField('c', 'case_state_realm', 'realm')
+      ->execute();
   foreach ($results as $row) {
     i18nstrings_update("casetracker:case_states:$row->csid:name", $row->name);
   }
@@ -803,7 +820,7 @@ function casetracker_autocomplete($string) {
   if (strpos(strtolower($unassigned), strtolower($string)) !== FALSE) {
     $matches[$unassigned] = $unassigned;
   }
-  drupal_json($matches);
+  drupal_json_output($matches);
 }
 
 /**
@@ -820,7 +837,7 @@ function _casetracker_get_og_query_string(&$project) {
     $querystring[] = 'gids[]=' . $project->nid;
     //checking if group-project is part of another group
     if (isset($project->og_groups)
-       && is_array($project->og_groups)
+        && is_array($project->og_groups)
     ) {
       foreach ($project->og_groups as $group) {
         $querystring[] = 'gids[]=' . $group;
@@ -829,8 +846,8 @@ function _casetracker_get_og_query_string(&$project) {
   }
   //checking if project is part of a group
   elseif (isset($project->og_groups)
-     && is_array($project->og_groups)
-     && $project->type !== 'group'
+      && is_array($project->og_groups)
+      && $project->type !== 'group'
   ) {
     foreach ($project->og_groups as $group) {
       $querystring[] = 'gids[]=' . $group;
@@ -880,8 +897,16 @@ function theme_casetracker_comment_changes($old, $new) {
     if ($new->{$field} != $old->{$field}) {
       switch ($field) {
         case 'pid':
-          $old_title = db_result(db_query("SELECT title FROM {node} WHERE nid = %d", $old->pid));
-          $new_title = db_result(db_query("SELECT title FROM {node} WHERE nid = %d", $new->pid));
+          $old_title = db_select('node', 'n')
+            ->fields('n', array('title'))
+            ->condition('n.nid', $old->pid)
+            ->execute()
+            ->fetchField();
+          $new_title = db_select('node', 'n')
+            ->fields('n', array('node'))
+            ->condition('n.nid', $new->pid)
+            ->execute()
+            ->fetchField();
           $old->{$field} = l($old_title, "node/{$old->pid}");
           $new->{$field} = l($new_title, "node/{$new->pid}");
           break;
@@ -907,7 +932,8 @@ function theme_casetracker_comment_changes($old, $new) {
   }
 
   if (!empty($rows)) {
-    return theme('table', NULL, $rows, array('class' => 'case_changes'));
+    //return theme('table', NULL, $rows, array('class' => 'case_changes'));
+    return theme('table', array('header' => NULL, 'rows' => $rows, 'attributes' => array('class' => 'case_changes')));
   }
 }
 
@@ -915,11 +941,13 @@ function theme_casetracker_comment_changes($old, $new) {
  * Theme function for cleaning up the casetracker common form.
  */
 function theme_casetracker_case_form_common($form) {
+  $form = $form[null];
+
   drupal_add_css(drupal_get_path('module', 'casetracker') . '/casetracker.css');
   $output = '';
   $output .= drupal_render($form['pid']);
   $output .= drupal_render($form['case_title']);
-
+dpm($form);
   if ($form['assign_to']['#type'] == 'radios') {
     if ($form['assign_to']['#access']) {
       $header = array_fill(0, 5, array());
@@ -929,7 +957,8 @@ function theme_casetracker_case_form_common($form) {
         $radios[] = drupal_render($form['assign_to'][$id]);
       }
       $radios = array_chunk($radios, 5);
-      $output .= theme('table', $header, $radios, array('class' => 'casetracker-assign-to'));
+      //$output .= theme('table', $header, $radios, array('class' => 'casetracker-assign-to'));
+      $output .= theme('table', array('header' => $header, 'rows' => $radios, 'attributes' => array('class' => 'casetracker-assign-to')));
     }
     drupal_render($form['assign_to']);
   }
@@ -944,7 +973,8 @@ function theme_casetracker_case_form_common($form) {
     }
   }
   $rows = array($row);
-  $output .= theme('table', array(), $rows);
+  //$output .= theme('table', array(), $rows);
+  $output .= theme('table', array('header' => array(), 'rows' => $rows));
   $output .= drupal_render($form);
   return $output;
 }
@@ -958,7 +988,17 @@ function theme_casetracker_case_form_common($form) {
  *   The node object of the project this case belongs to.
  */
 function theme_casetracker_case_summary($case, $project) {
-  $last_comment = db_result(db_query('SELECT last_comment_timestamp FROM {node_comment_statistics} WHERE nid = %d', $case->nid));
+  $project = $project[null]['#project'];
+  $case = $case[null]['#project'];
+
+dpm($project);
+dpm($case);
+
+  $last_comment = db_select('node_comment_statistics', 'n')
+    ->fields('n', array('last_comment_timestamp'))
+    ->condition('n.nid', $case->nid)
+    ->execute()
+    ->fetchField();
   $rows = array();
 
   // On node preview the form logic can't translate assign_to back to a uid for
@@ -979,12 +1019,14 @@ function theme_casetracker_case_summary($case, $project) {
   else {
     $rows[] = array(
       t('Assigned to:'),
-      theme('username', $assign_to),
+      //theme('username', $assign_to),
+      theme('username', array('account' => $assign_to)),
     );
   }
   $rows[] = array(
     t('Created:'),
-    t('!username at !date', array('!username' => theme('username', $case), '!date' => format_date($case->created, 'medium'))),
+    //t('!username at !date', array('!username' => theme('username', $case), '!date' => format_date($case->created, 'medium'))),
+    t('!username at !date', array('!username' => theme('username', array('account' => $case)), '!date' => format_date($case->created, 'medium'))),
   );
   $rows[] = array(
     t('Status:'),
@@ -1009,7 +1051,8 @@ function theme_casetracker_case_summary($case, $project) {
   }
 
   $output  = '<div class="case">';
-  $output .= theme('table', NULL, $rows, array('class' => 'summary'));
+  //$output .= theme('table', NULL, $rows, array('class' => 'summary'));
+  $output .= theme('table', array('header' => NULL, 'rows' => $rows, 'attributes' => array('class' => 'summary')));
   $output .= '</div>';
   return $output;
 }
@@ -1021,28 +1064,33 @@ function theme_casetracker_case_summary($case, $project) {
  *   The node object of the project being viewed.
  */
 function theme_casetracker_project_summary($project) {
+  $project = $project[null]['#project'];
+
   $rows = array();
   $rows[] = array(t('Project number:'), $project->nid);
-  $rows[] = array(t('Opened by:'), theme('username', $project));
-  $rows[] = array(t('Opened on:'), format_date($project->created, 'large'));
-  $rows[] = array(t('Last modified:'), format_date($project->changed, 'large'));
+  $rows[] = array(t('Opened by:'), theme('username', array('account' => $project)));
+  $rows[] = array(t('Opened on:'), format_date($project->created, 'long'));
+  $rows[] = array(t('Last modified:'), format_date($project->changed, 'long'));
 
   $querystring = _casetracker_get_og_query_string($project);
   $operations = array();
-  $node_types = node_get_types('names');
+  $node_types = node_type_get_names();
   foreach (array_filter(variable_get('casetracker_case_node_types', array('casetracker_basic_case'))) as $type) {
     $operations[] = l(
       t('add !name', array('!name' => $node_types[$type])),
       'node/add/' . str_replace('_', '-', $type) . '/' . $project->nid,
-      array('query' => $querystring)
+      array('query' => array('destination' => $querystring))
     );
   }
   $operations = implode(' | ', $operations); // ready for printing in our Operations table cell - delimited by a pipe. nonstandard.
-  $rows[] = array(t('Operations:'), $operations . ' | ' . l(t('view all project cases'), 'casetracker', array('query' => 'keys=&pid=' . $project->nid)));
+//dpm(t('view all project cases'), 'casetracker', array('query' => 'keys=&pid=' . $project->nid));
+  $rows[] = array(t('Operations:'), $operations . ' | ' . l(t('view all project cases'), 'casetracker', array('query' => array('destination' => 'keys=&pid=' . $project->nid))));
 
   $output  = '<div class="project">';
-  $output .= theme('table', NULL, $rows, array('class' => 'summary'));
+  $output .= theme('table', array('header' => NULL, 'rows' => $rows, 'attributes' => array('class' => 'summary')));
+  //$output .= theme('table', NULL, $rows, array('class' => 'summary'));
   $output .= '</div>';
+//dpm($output);
   return $output;
 }
 
@@ -1060,10 +1108,12 @@ function casetracker_project_options() {
     $view->set_display();
     $view->set_items_per_page(0);
     $view->execute();
+
     foreach ($view->result as $row) {
       $projects[$row->nid] = $row->node_title;
     }
   }
+dpm($projects);
   return $projects;
 }
 
@@ -1078,6 +1128,7 @@ function casetracker_user_options() {
     $view->set_items_per_page(0);
     $view->execute();
     foreach ($view->result as $row) {
+dpm($view);
       $options[$row->uid] = $row->users_name;
     }
   }
@@ -1137,7 +1188,11 @@ function casetracker_is_project($node) {
 function casetracker_get_uid($name = NULL, $reset = FALSE) {
   static $users = array();
   if (!isset($users[$name]) || $reset) {
-    $result = db_result(db_query("SELECT uid FROM {users} WHERE name = '%s'", $name));
+    $result = db_select('users', 'u')
+      ->fields('u', array('uid'))
+      ->condition('u.name', $name)
+      ->execute()
+      ->fetchField();
     $users[$name] = $result ? $result : 0;
   }
   return $users[$name];
@@ -1156,7 +1211,11 @@ function casetracker_get_name($uid = NULL, $reset = FALSE) {
       $users[0] = t('Unassigned');
     }
     else {
-      $result = db_result(db_query("SELECT name FROM {users} WHERE uid = %d", $uid));
+      $result = db_select('users', 'u')
+        ->fields('u', array('name'))
+        ->condition('u.uid', $uid)
+        ->execute()
+        ->fetchField();
       $users[$uid] = $result ? $result : '';
     }
   }
@@ -1188,4 +1247,50 @@ function casetracker_tokens($type, $object = NULL) {
 function casetracker_token_info($type = 'all') {
   module_load_include('inc', 'casetracker', 'casetracker.token');
   return _casetracker_token_info($type);
+}
+
+
+
+
+
+
+
+
+/*
+ * TODO remove the bellow functions when theres no need to use db_placeholders.
+ */
+function db_placeholders($arguments, $type = 'int') {
+  $placeholder = db_type_placeholder($type);
+  return implode(',', array_fill(0, count($arguments), $placeholder));
+}
+
+function db_type_placeholder($type) {
+  switch ($type) {
+    case 'varchar':
+    case 'char':
+    case 'text':
+    case 'datetime':
+      return "'%s'";
+
+    case 'numeric':
+      // Numeric values are arbitrary precision numbers.  Syntacically, numerics
+      // should be specified directly in SQL. However, without single quotes
+      // the %s placeholder does not protect against non-numeric characters such
+      // as spaces which would expose us to SQL injection.
+      return '%n';
+
+    case 'serial':
+    case 'int':
+      return '%d';
+
+    case 'float':
+      return '%f';
+
+    case 'blob':
+      return '%b';
+  }
+
+  // There is no safe value to return here, so return something that
+  // will cause the query to fail.
+  return 'unsupported type ' . $type . 'for db_type_placeholder';
 }

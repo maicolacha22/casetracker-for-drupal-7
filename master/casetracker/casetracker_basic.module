@@ -22,14 +22,12 @@ function casetracker_basic_node_info() {
       'base' => 'casetracker_basic_project',
       'description' => t('Create a basic project for use with Case Tracker.'),
       'help' => t('Create a basic project for use with Case Tracker.'),
-      'body_label' => t('Description'),
     ),
     'casetracker_basic_case' => array(
       'name' => t('Case'),
       'base' => 'casetracker_basic_case',
       'description' => t('Open a new case assigned to a particular project.'),
       'help' => t('Open a new case assigned to a particular project.'),
-      'body_label' => t('Description'),
     ),
   );
 }
@@ -48,7 +46,7 @@ function casetracker_basic_project_form(&$node) {
       '#default_value' => !empty($node->title) ? $node->title : NULL,
       '#weight' => -5,
     );
-    $form['body_field'] = node_body_field($node, $type->body_label, $type->min_word_count);
+    //$form['body_field'] = node_body_field($node, $type->body_label, $type->min_word_count);
   }
   return $form;
 }
@@ -67,7 +65,7 @@ function casetracker_basic_case_form(&$node) {
       '#default_value' => !empty($node->title) ? $node->title : NULL,
       '#weight' => -5,
     );
-    $form['body_field'] = node_body_field($node, $type->body_label, $type->min_word_count);
+    //$form['body_field'] = node_body_field($node, $type->body_label, $type->min_word_count);
   }
   return $form;
 }

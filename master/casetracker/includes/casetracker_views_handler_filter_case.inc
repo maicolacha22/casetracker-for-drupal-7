@@ -10,6 +10,11 @@ class casetracker_views_handler_filter_case extends views_handler_filter {
       $placeholders = db_placeholders($case_types, 'varchar');
       $table = $this->query->ensure_table('node');
       $this->query->add_where($this->options['group'], "$table.type IN ($placeholders)", $case_types);
+
+      //$placeholders = $this->placeholder();
+      //$table = $this->query->ensure_table('node');
+      //$this->query->add_where_expression($this->options['group'], "$table.type IN ($placeholders)", array($placeholders => '%' . $case_types));
+
     }
     else {
       $this->query->add_where($this->options['group'], "FALSE");
