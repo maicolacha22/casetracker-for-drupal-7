@@ -55,15 +55,26 @@ class casetracker_views_handler_field_case_count extends views_handler_field {
       $this->counts = array();
       $placeholders = db_placeholders($nids, 'int');
 
+      $query = db_select('casetracker_case', 'c')
+        ->fields('c', array('pid'));
+      $query->addExpression('COUNT(c.nid)', 'count');
+
       // Add a filter by realm/type if option is set.
       $where = '';
       if (!empty($this->options['type'])) {
         $filter = explode('-', $this->options['type']);
-        $where = "AND case_{$filter[0]}_id = %d";
+        //$where = "AND case_{$filter[0]}_id = %d";
+        $query->condition(case_{$filter[0]}_id, $nids);
         $nids[] = $filter[1];
       }
 
-      $result = db_query("SELECT count(c.nid) AS count, c.pid FROM {casetracker_case} c JOIN {node} n ON c.nid = n.nid AND c.vid = n.vid WHERE c.pid IN ($placeholders) $where GROUP BY c.pid", $nids);
+      //$result = db_query("SELECT count(c.nid) AS count, c.pid FROM {casetracker_case} c JOIN {node} n ON c.nid = n.nid AND c.vid = n.vid WHERE c.pid IN ($placeholders) $where GROUP BY c.pid", $nids);
+      $query->condition('c.pid', $nids, 'IN');
+      $query->join('node', 'n', 'c.nid = n.nid AND c.vid = n.vid');
+      $query->groupBy('c.pid');
+      $result = $query->execute();
+dpm($result);
+
       while ($row = db_fetch_object($result)) {
         $this->counts[$row->pid] = $row->count;
       }

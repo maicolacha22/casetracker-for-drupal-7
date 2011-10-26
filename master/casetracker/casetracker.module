@@ -808,7 +808,12 @@ function casetracker_case_state_delete($csid = NULL) {
 function casetracker_autocomplete($string) {
   $matches = array();
   $options = casetracker_user_options();
-  $result = db_query_range("SELECT name FROM {users} WHERE LOWER(name) LIKE LOWER('%s%%')", $string, 0, 10);
+  //$result = db_query_range("SELECT name FROM {users} WHERE LOWER(name) LIKE LOWER('%s%%')", $string, 0, 10);
+  $result = db_select('users')
+    ->fields('users', array('name'))
+    ->condition('name', db_like($string) . '%', 'LIKE')
+    ->range(0, 10)
+    ->execute();
   foreach ($result as $user) {
     if (in_array($user->name, $options, TRUE)) {
       $matches[$user->name] = check_plain($user->name);
@@ -947,7 +952,7 @@ function theme_casetracker_case_form_common($form) {
   $output = '';
   $output .= drupal_render($form['pid']);
   $output .= drupal_render($form['case_title']);
-dpm($form);
+
   if ($form['assign_to']['#type'] == 'radios') {
     if ($form['assign_to']['#access']) {
       $header = array_fill(0, 5, array());
@@ -958,7 +963,10 @@ dpm($form);
       }
       $radios = array_chunk($radios, 5);
       //$output .= theme('table', $header, $radios, array('class' => 'casetracker-assign-to'));
-      $output .= theme('table', array('header' => $header, 'rows' => $radios, 'attributes' => array('class' => 'casetracker-assign-to')));
+      $output .= theme('table', array(
+        'header' => $header,
+        'rows' => $radios,
+        'attributes' => array('class' => array('casetracker-assign-to'))));
     }
     drupal_render($form['assign_to']);
   }
@@ -975,7 +983,10 @@ dpm($form);
   $rows = array($row);
   //$output .= theme('table', array(), $rows);
   $output .= theme('table', array('header' => array(), 'rows' => $rows));
-  $output .= drupal_render($form);
+dpm($form);
+  // TODO commenting the bellow line removes possible infinite
+  // recursion/iteration on add case form. WHY?
+  //$output .= drupal_render($form);
   return $output;
 }
 
@@ -1110,10 +1121,11 @@ function casetracker_project_options() {
     $view->execute();
 
     foreach ($view->result as $row) {
-      $projects[$row->nid] = $row->node_title;
+      //$projects[$row->nid] = $row->node_title;
+$projects[1] = $row->node_title;
     }
+dpm($view);
   }
-dpm($projects);
   return $projects;
 }
 
@@ -1128,9 +1140,9 @@ function casetracker_user_options() {
     $view->set_items_per_page(0);
     $view->execute();
     foreach ($view->result as $row) {
-dpm($view);
       $options[$row->uid] = $row->users_name;
     }
+dpm($view);
   }
 
   $anon_user = casetracker_default_assign_to();

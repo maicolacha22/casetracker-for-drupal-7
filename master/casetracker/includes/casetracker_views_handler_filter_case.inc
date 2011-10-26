@@ -7,14 +7,11 @@ class casetracker_views_handler_filter_case extends views_handler_filter {
     $case_types = array_filter(variable_get('casetracker_case_node_types', array('casetracker_basic_case')));
 
     if (!empty($case_types)) {
-      $placeholders = db_placeholders($case_types, 'varchar');
+      //$placeholders = db_placeholders($case_types, 'varchar');
+      $placeholders = $this->placeholder();
       $table = $this->query->ensure_table('node');
-      $this->query->add_where($this->options['group'], "$table.type IN ($placeholders)", $case_types);
-
-      //$placeholders = $this->placeholder();
-      //$table = $this->query->ensure_table('node');
-      //$this->query->add_where_expression($this->options['group'], "$table.type IN ($placeholders)", array($placeholders => '%' . $case_types));
-
+      //$this->query->add_where($this->options['group'], "$table.type IN ($placeholders)", $case_types);
+      $this->query->add_where_expression($this->options['group'], "$table.type IN ($placeholders)", array($placeholders => $case_types));
     }
     else {
       $this->query->add_where($this->options['group'], "FALSE");
