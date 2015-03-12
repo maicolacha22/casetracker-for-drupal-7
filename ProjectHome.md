@@ -1,0 +1,1 @@
+This is Case Tracker for Drupal 7. Later it must be migrated to Drupal repository.
